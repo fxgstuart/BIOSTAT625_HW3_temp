@@ -16,4 +16,373 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(FitLM)
+library(ggplot2)
+library(car)
+library(bench)
 ```
+
+## Background
+
+### *(1).Linear Regression*
+
+[Linear Regression](https://en.wikipedia.org/wiki/Linear_regression) is a widely used statistical method for modelling the relationship between an outcome and one or more predictors. In practice, it can be used for prediction, as well as quantifying the strength of the linearly association between the outcome and the explanatory variables. The most commonly used approach for estimating the unknown parameters in a linear regression model is [ordinary least squares(OLS)](https://en.wikipedia.org/wiki/Ordinary_least_squares). 
+
+### *(2)."lm" function in R*
+
+The existing `stats::lm` in `R` is a powerful function that can help us fit the basic linear regression model. By further applying the `base:summary()` function, we can obtain the point estimate, standard error, $t$-statistics and $p$-value of each single $\beta$, and the result from the overall $F$-test. 
+
+However, the `stats::lm` function can not directly output the confidence interval(CI) of $\hat{\beta}$. Moreover, as one of the most important matrices derived from linear regression model, hat matrix contains many important information (especially when we want to deal with some residual-related problems), but unfortunately the `stats::lm` function doesn't provide it directly. 
+
+
+### *(3).What can "FitLM" package do?*
+
+We develop an user-friendly R package `FitLM`, which can be seen as an extension of the existing `stats::lm` function. 
+
+Specifically, users can obtain the following results easily by using `FitLM` package:
+
+* Fit a linear regression model with or without an intercept.
+* Obtain the point estimates and standard errors of $\beta$'s.
+* Obtain the confidence interval of $\hat{\beta}$'s.
+* Obtain the $t$-statistic from $t$-test, and the corresponding $p$-value.
+* Obtain the $F$-statistic from partial $F$-test, and the corresponding $p$-value.
+* Obtain the $F$-statistic from overall test, and the corresponding $p$-value.
+* Obtain the $R^2$ and adjusted $R^2$.
+* Obtain the $hat$-matrix.
+* Conduct the General Linear Hypothesis (GLH) testing.
+
+
+## Configuration and Installation
+
+* `LinearRegression.basic` is a package based on [R](https://cloud.r-project.org/), please install R first. We also strongly recommend you install [RStudio](https://www.rstudio.com/products/rstudio/download/), which is an integrated development environment (IDE) for R.
+
+* `LinearRegression.basic` can be downloaded from github now:
+
+  ```
+  devtools::install_github("ybshao0709/LinearRegression.basic", build_vignettes = T)
+  ```
+
+* You might also need to install the `devtools` first. You can configure the environment by following these steps:
+ 
+  (1) Install the release version of devtools from CRAN with `install.packages("devtools")`.
+  
+  (2) Setting up working development environment:
+      
+      *- Windows*: Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
+      
+      *- Mac*: Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store.
+      
+      *- Linux*: Install a compiler and various development libraries (details vary across differnet flavors of Linux).
+  
+  (3) Follow the instructions below depending on platform:
+      
+      *- Mac & Linux:* 
+      ```
+      devtools::install_github("hadley/devtools")
+      ```
+      
+      *- Windows:* 
+      
+      ```
+      library(devtools)
+      build_github_devtools()
+      #### Restart R before continuing ####
+      install.packages("devtools.zip", repos = NULL)
+      # Remove the package after installation
+      unlink("devtools.zip")
+      ```
+      
+  Find more tutorials [here](https://www.r-project.org/nosvn/pandoc/devtools.html).
+
+## Loading packages
+
+```
+library(LinearRegression.basic)
+```
+
+## How to use?
+
+For fitting a linear regression model by `LinearRegression.basic` package, users only need to prepare two data sets as prediction variables and outcome variable respectively. The former one is a numerical matrix, where each row represents an observation and each column represents a prediction variable (intercept should not be included). The latter is a column vector (or a n by 1 numerical matrix) representing the outcome variable. 
+
+*(Note that since this function is based on matrix operations, if you have any character variables or categorical variables in your dataset, be sure to properly convert them to numeric and dummy variables before using this package.)* 
+
+&nbsp;&nbsp;
+
+**`linear_Regression` is the function in the current package that allows you to obtain all the results. This function has the following useful arguments:**
+
+* **y**: A column vector, treated as outcome.
+
+* **x**: A numerical matrix, treated as predictor.
+
+* **intercept**:  Logical values, TRUE (by default) or FALSE. If "TRUE", the model will include the intercept.
+
+* **CI.beta**: Logical values, TRUE or FALSE (by default). If "TRUE", the model will output the confidence interval of $\beta$'s.
+
+* **CI.level**: A numeric number, 0.95 by default. Specifying the $\alpha$-level when calculate CIs of $\beta$'s. (only use when "CI.beta = TRUE")
+
+* **partial.T**: Logical values, TRUE (by default) or FALSE. If "TRUE", the results will output the results of partial T-test and the corresponding p-values.
+
+* **overall.F**: Logical values, TRUE (by default) or FALSE. If "TRUE", the results will output the results of overall F-test and the corresponding p-value.
+
+* **r.square**: Logical values, TRUE or FALSE (by default). If "TRUE", the results not output the $R^2$ and adjusted $R^2$ of the fitted model.
+
+* **Hat.matrix**: Logical values, TRUE or FALSE (by default).  If "TRUE", the $hat$ matrix will be provided.
+
+* **GLH.F**: Logical values, TRUE or FALSE (by default).  If "TRUE", general linear hypothesis testing will be conducted.
+
+* **contrast.matrix**: A numerical matrix (or vector) giving linear combinations of coefficients by rows. (only use when "GLH.F = TRUE")
+
+* **c.matrix**: A vector represents the right-hand-side constant vector for GLH test. It defaults to a vector of zeroes if this argument is omitted.  (only use when "GLH.F = TRUE")      
+
+*see the help page:*
+
+```
+help("linear_Regression")
+```
+
+&nbsp;&nbsp;
+
+**Now, let's take a look at some examples of how to use the this package in detail:**
+
+We use the `"state.x77"` dataset as an example. `"state.x77"` is a dataframe with 50 rows and 8 numerical columns related to the 50 states of the United States of America. 
+
+The following statistics is provided in the respective columns:
+
+* Population: population estimate as of July 1, 1975.
+
+* Income: per capita income (1974)
+
+* Illiteracy: illiteracy (1970, percent of population)
+
+* Life Exp: life expectancy in years (1969-71)
+
+* Murder: murder and non-negligent manslaughter rate per 100,000 population (1976)
+
+* HS Grad: percent high-school graduates (1970)
+
+* Frost: mean number of days with minimum temperature below freezing (1931-1960) in capital or large city
+
+* Area: land area in square miles
+
+The `"state.x77"` dataset has been included in `LinearRegression.basic` package, and you can see the structure of the dataset by using the following command:
+
+```
+?LinearRegression.basic::state.x77
+```
+
+*[Learn more about this dataset](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/state.html)*
+
+&nbsp;&nbsp;
+
+*(1) Fit a simple linear regression model:*
+
+```{r, collapse=TRUE}
+y <- as.matrix(state.x77$`Life Exp`)
+colnames(y) <- "Life Exp"
+x <- as.matrix(state.x77$Murder)
+colnames(x) <- "Murder"
+SLR.model <- linear_Regression(y, x)
+print(SLR.model$model.coefs)
+```
+
+```{r, fig.height = 3, fig.width = 5, fig.align = "left", warning=FALSE}
+ggplot() + geom_point(aes(x, y)) + 
+  geom_abline(color = "red", intercept =  SLR.model$model.coefs[1,1], slope = SLR.model$model.coefs[2,1]) + 
+  theme(panel.grid = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black")) + 
+  ggtitle("Plot of life epectancy against murder rate") + labs(x = "Murder Rate", y = "Life Expectancy")
+```
+
+*(2) Fit a mutiple linear regression model with or withour an intercept:*
+
+Regression model with the intercept:
+
+```{r,collapse=TRUE}
+y <- as.matrix(state.x77$`Life Exp`)
+colnames(y) <- "Life Exp"
+x <- as.matrix(state.x77[,c(1:3, 5:8)])
+MLR.model.with.intercept <- linear_Regression(y, x, intercept = T)
+print(cbind(MLR.model.with.intercept$model.coefs, MLR.model.with.intercept$partial_T.test))
+```
+
+Regression model without the intercept:
+
+```{r}
+MLR.model.no.intercept <- linear_Regression(y, x, intercept = F)
+print(MLR.model.no.intercept$model.coefs)
+```
+
+*(3) Calculate the 95% confidence interval of $\beta$'s:*
+
+```{r, collapse=TRUE}
+CI.95.actual <- linear_Regression(y, x, CI.beta = TRUE, CI.level = 0.95)$model.coefs[, c(3, 4)]
+print(CI.95.actual)
+```
+
+*(4) Calculate $R^2$ and adjusted $R^2$ of linear model:*
+
+```{r}
+r.square <- linear_Regression(y, x, r.square = T)$R_squared[[1]]
+adjusted.r.square <- linear_Regression(y, x, r.square = T)$R_squared[[2]]
+```
+
+*(5) Obtain $hat$-matrix:*
+
+```{r}
+hat.matrix <- linear_Regression(y, x, Hat.matrix = T)$hat.matrix
+```
+
+*(6) Conduct General Linear Hypothesis testing:*
+
+```{r}
+contrast.matrix <- matrix(c(0, 1,-1, 0, 0, 0, 0, 0), nrow = 1)  # define the contrast matrix
+c.matrix <- c(0)  # define the constant matrix
+GLH.F <- linear_Regression(y, x, GLH.F = T, contrast.matrix = contrast.matrix, 
+                           c.matrix = c.matrix)$GLH.test$GLH.F.statistics
+GLH.p <- linear_Regression(y, x, GLH.F = T, contrast.matrix = contrast.matrix, 
+                           c.matrix = c.matrix)$GLH.test$p.value
+print(GLH.F)
+print(GLH.p)
+``` 
+
+&nbsp;&nbsp;
+
+## Correctness
+
+**(1) Compare the point estimate and standard error of $\beta$'s, and results from the partial $T$-test**
+```{r,collapse=TRUE}
+y <- as.matrix(state.x77$`Life Exp`)
+colnames(y) <- "Life Exp"
+x <- as.matrix(state.x77[,c(1:3, 5:8)])
+MLR.model.with.intercept <- linear_Regression(y, x, intercept = T)
+print(cbind(MLR.model.with.intercept$model.coefs, MLR.model.with.intercept$partial_T.test))
+```
+
+For comparison, we use `stats::lm()` function to fit this model to prove the correctness of `linear_Regression()`:
+
+```{r,collapse=TRUE}
+summary(lm(y ~ x))$coefficients
+```
+
+```{r,collapse=TRUE}
+all.equal(as.vector(MLR.model.with.intercept$model.coefs[, 1]), 
+          as.vector(summary(lm(y ~ x))$coefficients[, 1]))
+all.equal(as.vector(MLR.model.with.intercept$model.coefs[, 2]), 
+          as.vector(summary(lm(y ~ x))$coefficients[, 2]))
+all.equal(as.vector(MLR.model.with.intercept$partial_T.test[, 1]), 
+          as.vector(summary(lm(y ~ x))$coefficients[, 3]))
+all.equal(as.vector(MLR.model.with.intercept$partial_T.test[, 2]), 
+          as.vector(summary(lm(y ~ x))$coefficients[, 4]))
+```
+
+**(2) Calculate the 95% confidence interval of $\beta$'s:**
+
+```{r, collapse=TRUE}
+CI.95.actual <- linear_Regression(y, x, CI.beta = TRUE, CI.level = 0.95)$model.coefs[, c(3, 4)]
+print(CI.95.actual)
+```
+
+The above results are are consistent with the results from `stats::confint`: 
+
+```{r}
+CI.95.expected <- confint(lm(y ~ x))
+print(CI.95.expected)
+```
+
+```{r}
+all.equal(as.vector(CI.95.actual[, 1]), as.vector(CI.95.expected[, 1]))
+all.equal(as.vector(CI.95.actual[, 2]), as.vector(CI.95.expected[, 2]))
+```
+
+**(3) Results of overall F-test:**
+
+```{r, collapse=TRUE}
+actual.F.stat <- linear_Regression(y, x)$overall_F.test$overall_F.statistics
+expected.F.stat <- as.numeric(summary(lm(y ~ x))$fstatistic[1])
+all.equal(actual.F.stat, expected.F.stat)  #compare overall f-statistics
+```
+
+**(4) Results of $R^2$ and adjusted $R^2$:**
+
+```{r, collapse=TRUE}
+actual.R.Squared <- as.numeric(linear_Regression(y, x, r.square = T)$R_squared[1]) 
+expected.R.Squared <- as.numeric(summary(lm(y ~ x))$r.squared)
+all.equal(actual.R.Squared, expected.R.Squared)
+actual.adjusted.R.Squared <- as.numeric(linear_Regression(y, x, r.square = T)$R_squared[2])
+expected.adjusted.R.Squared <- as.numeric(summary(lm(y ~ x))$adj.r.squared)
+all.equal(actual.adjusted.R.Squared, expected.adjusted.R.Squared)
+```
+
+**(5) Conduct General Linear Hypothesis testing:**
+
+```{r}
+contrast.matrix <- matrix(c(0, 1,-1, 0, 0, 0, 0, 0), nrow = 1)  # define the contrast matrix
+c.matrix <- c(0)  # define the constant matrix
+GLH.F <- linear_Regression(y, x, GLH.F = T, contrast.matrix = contrast.matrix, 
+                           c.matrix = c.matrix)$GLH.test$GLH.F.statistics
+GLH.p <- linear_Regression(y, x, GLH.F = T, contrast.matrix = contrast.matrix, 
+                           c.matrix = c.matrix)$GLH.test$p.value
+``` 
+
+We use `car::linearHypothesis()` function to conduct the GLH test, and compare the results with those from `linear_Regression()`:
+
+```{r}
+GLH.expected <- car::linearHypothesis(model = lm(y ~ x), 
+                                      hypothesis.matrix = contrast.matrix, rhs = c.matrix)
+all.equal(as.vector(c(GLH.F, GLH.p)), as.vector(c(GLH.expected$F[2], GLH.expected$`Pr(>F)`[2])))
+```
+
+
+&nbsp;&nbsp;
+
+## Efficiency
+
+Because the `LinearRegression.basic::linear_Regression()` function is based on matrices computation, and only focuses on the estimation of the basic parameters in the linear regression model, it runs much faster than the `stats::lm()` function.
+
+Let's compare the speed by using `bench:mark()` function:
+
+*(Note: package `bench` should be installed)*
+
+```{r,collapse=TRUE}
+y <- as.matrix(state.x77$`Life Exp`)
+colnames(y) <- "Life Exp"
+x <- as.matrix(state.x77[,c(1:3, 5:8)])
+code_efficiency_comparison <-  bench::mark(linear_Regression = {
+  beta.actual <-
+    linear_Regression(y, x, intercept = T)$model.coefs[, 1]
+  as.vector(beta.actual)
+}, "stat::lm" = {
+  beta.expected <- lm(y ~ x)$coefficients
+  as.vector(beta.expected)
+})  
+summary(code_efficiency_comparison)
+itr.per.sec <- as.numeric(code_efficiency_comparison[[4]])
+itr.per.sec.ratio <- itr.per.sec[1] / itr.per.sec[2]
+```
+
+From the results of `bench::mark`, it can be seen that `LinearRegression.basic::linear_Regression` is about `r round(itr.per.sec.ratio, digits = 2)` times as faster as `stats:lm`.
+
+Also, we compare the speed of conducting GLH test:
+
+```{r}
+contrast.matrix <- matrix(c(0, 1,-1, 0, 0, 0, 0, 0), nrow = 1)  
+c.matrix <- c(0)  
+code_efficiency_comparison.GLH <- bench::mark("linear_Regression" = {
+  GLH.F.statistics.actual <- 
+    linear_Regression(y, x, GLH.F = T, contrast.matrix = contrast.matrix, 
+                      c.matrix = c.matrix)$GLH.test$GLH.F.statistics
+  as.vector(GLH.F.statistics.actual)
+}, "stat::lm" = {
+  GLH.F.statistics.expected <- 
+    car::linearHypothesis(model = lm(y ~ x), 
+                          hypothesis.matrix = contrast.matrix, rhs = c.matrix)$F[2]
+  as.vector(GLH.F.statistics.expected)
+})
+summary(code_efficiency_comparison.GLH)
+GLH.itr.per.sec <- as.numeric(code_efficiency_comparison.GLH[[4]])
+GLH.itr.per.sec.ratio <- GLH.itr.per.sec[1] / GLH.itr.per.sec[2]
+```
+
+It can be seen that `LinearRegression.basic::linear_Regression` is about `r round(GLH.itr.per.sec.ratio, digits = 2)` times as faster as `car::linearHypothesis` when conducting the GLH test.
+
+
+

@@ -16,7 +16,8 @@
 #'
 #'@export
 #'
-fit.coef <- function(X,y){
+fit.coef <- function(X,y,intercept=T){
+  if(intercept) X <- cbind(rep(1,nrow(X)),X)
   return(as.vector(solve(crossprod(X))%*%crossprod(X,y)))
 }
 
