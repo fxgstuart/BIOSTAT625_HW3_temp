@@ -6,6 +6,9 @@
 #'
 #'@param y input value of responses
 #'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
 #'@return the estimated coefficients of linear model constructing by X and y
 #'
 #'@examples
@@ -32,6 +35,9 @@ fit.coef <- function(X,y,intercept=T){
 #'
 #'@param y input value of responses
 #'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
 #'@return the fitted values of linear model constructing by X and y
 #'
 #'@examples
@@ -42,8 +48,11 @@ fit.coef <- function(X,y,intercept=T){
 #'
 #'@export
 #'
-fit.values <- function(X,y){
-  beta <- fit.coef(X,y)
+fit.values <- function(X,y,intercept=T){
+  if(intercept){
+    X <- cbind(rep(1,nrow(X)),X)
+  }
+  beta <- fit.coef(X,y,intercept)
   return(as.vector(X%*%beta))
 }
 
@@ -54,6 +63,9 @@ fit.values <- function(X,y){
 #'@param X input value of covariate matrix/vector
 #'
 #'@param y input value of responses
+#'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
 #'
 #'@param Xnew covariate matrix of new data that needs to predict
 #'
@@ -69,8 +81,11 @@ fit.values <- function(X,y){
 #'
 #'@export
 #'
-fit.predict <- function(X,y,Xnew){
-  beta <- fit.coef(X,y)
+fit.predict <- function(X,y,Xnew,intercept=T){
+  if(intercept){
+    X <- cbind(rep(1,nrow(X)),X)
+  }
+  beta <- fit.coef(X,y,intercept)
   return(as.vector(Xnew%*%beta))
 }
 
@@ -82,6 +97,9 @@ fit.predict <- function(X,y,Xnew){
 #'
 #'@param y input value of responses
 #'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
 #'@return the estimated residual of linear model constructing by X and y
 #'
 #'@examples
@@ -92,10 +110,12 @@ fit.predict <- function(X,y,Xnew){
 #'
 #'@export
 #'
-fit.sigma.squared <- function(X,y){
+fit.sigma.squared <- function(X,y,intercept=T){
   n <- nrow(X)
   p <- ncol(X)
-  y.hat <- fit.values(X,y)
+
+  p <- p+intercept
+  y.hat <- fit.values(X,y,intercept)
   epsilon.hat <- y-y.hat
   mse <- crossprod(epsilon.hat)/(n-p)
 
@@ -110,6 +130,9 @@ fit.sigma.squared <- function(X,y){
 #'
 #'@param y input value of responses
 #'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
 #'@return The estimated standard deviation of each parameter of linear model constructing by X and y
 #'
 #'@examples
@@ -120,8 +143,8 @@ fit.sigma.squared <- function(X,y){
 #'
 #'@export
 #'
-fit.sd <- function(X,y){
-  sigma.squared <- fit.sigma.squared(X,y)
+fit.sd <- function(X,y,intercept=T){
+  sigma.squared <- fit.sigma.squared(X,y,intercept)
   var.betahat <- diag(crossprod(X))*c(sigma.squared)
   sd.betahat <- sqrt(var.betahat)
 
@@ -136,6 +159,9 @@ fit.sd <- function(X,y){
 #'
 #'@param y input value of responses
 #'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
 #'@return The test statistic and corresponding p-value of each parameter of linear model constructing by X and y
 #'
 #'@examples
@@ -146,15 +172,80 @@ fit.sd <- function(X,y){
 #'
 #'@export
 #'
-fit.t.test <- function(X,y){
+fit.t.test <- function(X,y,intercept=T){
   n <- nrow(X)
-  p <- ncol(X)
-  betahat <- fit.coef(X,y)
-  sd.betahat <- fit.sd(X,y)
+  p <- ncol(X)+intercept
+  betahat <- fit.coef(X,y,intercept)
+  sd.betahat <- fit.sd(X,y,intercept)
   t.stat <- c(betahat/sd.betahat)
   p.value <- c(2*(1-pt(t.stat,n-p)))
 
   return(list(t = t.stat, p.value = p.value))
+}
+
+#'fit.confint
+#'
+#'Construct the confidence intervals parameters of a linear model
+#'
+#'@param X input value of covariate matrix/vector
+#'
+#'@param y input value of responses
+#'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
+#'@param level numerical value, stands for the significance of the confidence interval
+#'
+#'@return The upper and lower bounds of confidence interval for linear model constructing by X and y
+#'
+#'@examples
+#'X <- matrix(rnorm(120),nrow=12,ncol=10)
+#'X <- cbind(rep(1,12),X)
+#'y <- rnorm(12)
+#'fit.confint(X,y)
+#'
+#'@export
+#'
+fit.confint <- function(X,y,intercept=T,level=0.95){
+  n <- nrow(X)
+  p <- ncol(X)+intercept
+  betahat <- fit.coef(X,y,intercept)
+  sd.betahat <- fit.sd(X,y,intercept)
+  t.value <- pt(1-(1-level)/2,n-p)
+
+  beta.CI.upper <- betahat + t.value * se_betahat
+  beta.CI.lower <- betahat - t.bound * se_betahat
+  CI.beta.matrix <- cbind(beta.CI.lower, beta.CI.upper)
+  colnames(CI.beta.matrix) <- c("lower","upper")
+
+  return(CI.beta.matrix)
+}
+
+#'fit.hat.matrix
+#'
+#'Calculate the hat matrix of a linear model
+#'
+#'@param X input value of covariate matrix/vector
+#'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
+#'@return The upper and lower bounds of confidence interval for linear model constructing by X and y
+#'
+#'@examples
+#'X <- matrix(rnorm(120),nrow=12,ncol=10)
+#'X <- cbind(rep(1,12),X)
+#'y <- rnorm(12)
+#'fit.hat.matrix(X)
+#'
+#'@export
+#'
+fit.hat.matrix <- function(X,intercept=T){
+  if(intercept){
+    X <- cbind(rep(1,nrow(X)),X)
+  }
+
+  return(X%*%solve(crossprod(X))%*%t(X))
 }
 
 #'fit.overall.test
@@ -164,6 +255,9 @@ fit.t.test <- function(X,y){
 #'@param X input value of covariate matrix/vector
 #'
 #'@param y input value of responses
+#'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
 #'
 #'@return The test statistic and corresponding p-value of the overall test for linear model constructing by X and y
 #'
@@ -175,15 +269,15 @@ fit.t.test <- function(X,y){
 #'
 #'@export
 #'
-fit.overall.test <- function(X,y){
+fit.overall.test <- function(X,y,intercept=T){
   n <- nrow(X)
-  p <- ncol(X)
-  yhat <- fit.values(X,y)
+  p <- ncol(X)+intercept
+  yhat <- fit.values(X,y,intercept)
   SSE <- sum((y-yhat)^2)
   SSR <- sum((yhat-mean(y))^2)
 
-  F.stat <- (SSR/p)/(SSE/(n-p))
-  p.value <- 1-pf(F.stat, p, n-p)
+  F.stat <- (SSR/(p-intercept))/(SSE/(n-p))
+  p.value <- 1-pf(F.stat, p-intercept, n-p)
   return(list(F = F.stat, p.value = p.value))
 }
 
@@ -195,6 +289,9 @@ fit.overall.test <- function(X,y){
 #'
 #'@param y input value of responses
 #'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
 #'@return The estimated R squared of linear model constructing by X and y
 #'
 #'@examples
@@ -205,14 +302,17 @@ fit.overall.test <- function(X,y){
 #'
 #'@export
 #'
-fit.R.squared <- function(X,y){
+fit.R.squared <- function(X,y,intercept=T){
   n <- nrow(X)
-  p <- ncol(X)
-  yhat <- fit.values(X,y)
+  p <- ncol(X)+intercept
+  yhat <- fit.values(X,y,intercept)
   SSE <- sum((y-yhat)^2)
   SSR <- sum((yhat-mean(y))^2)
 
-  return(SSR/(SSR+SSE))
+  res1 <- SSR/(SSR+SSE)
+  res2 <- 1-(SSE/(n-p))/(SSY/(n-intercept))
+
+  return(list(R.squared = res1, adj.R.squared = res2))
 }
 
 #'fit.partial.test
@@ -223,7 +323,10 @@ fit.R.squared <- function(X,y){
 #'
 #'@param y input value of responses
 #'
-#'@param idx a vector of indices of tested parameters(cannot includes 1, which stands for intercept)
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
+#'@param idx a vector of indices of tested parameters
 #'
 #'@return The test statistic and corresponding p-value of the partial test for linear model constructing by X and y
 #'
@@ -231,23 +334,23 @@ fit.R.squared <- function(X,y){
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
 #'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
-#'fit.overall.test(X,y)
+#'fit.partial.test(X,y,idx=c(3:5))
 #'
 #'@export
 #'
-fit.partial.test <- function(X,y,idx){
+fit.partial.test <- function(X,y,intercept=T,idx){
   X.temp <- X[,-c(idx)]
-  yhat.temp <- fit.values(X.temp,y)
+  yhat.temp <- fit.values(X.temp,y,intercept)
   SSR.temp <- sum((yhat.temp-mean(y))^2)
 
-  yhat <- fit.values(X,y)
+  yhat <- fit.values(X,y,intercept)
   SSR <- sum((yhat-mean(y))^2)
 
   SS <- SSR-SSR.temp
-  sigma.squared <- fit.sigma.squared(X,y)
+  sigma.squared <- fit.sigma.squared(X,y,intercept)
 
   F.stat <- (SS/length(idx))/sigma.squared
-  p.value <- 1-pf(F.stat, length(idx), nrow(X)-ncol(X))
+  p.value <- 1-pf(F.stat, length(idx), nrow(X)-ncol(X)-intercept)
 
   return(list(F.stat = F.stat, p.value = p.value))
 }
@@ -261,6 +364,9 @@ fit.partial.test <- function(X,y,idx){
 #'
 #'@param y input value of responses
 #'
+#'@param intercept logical, "TRUE" by default.
+#'If "FALSE", the model will not include the intercept.
+#'
 #'@param T.matrix hypothesis matrix (or vector) giving linear combinations of coefficients by rows
 #'
 #'@param c right-hand-side vector for hypothesis, with as many entries as rows in the hypothesis matrix;
@@ -272,15 +378,23 @@ fit.partial.test <- function(X,y,idx){
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
 #'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
-#'fit.overall.test(X,y)
+#'T <- matrix(0,nrow=2,ncol=11)
+#'T[4,1]<-1
+#'T[5,1]<--1
+#'T[5,2]<-1
+#'T[6,2]<--1
+#'fit.GLH.test(X,y,T.matrix)
 #'
 #'@export
 #'
-fit.GLH.test <- function(X,y,T.matrix,c=NULL){
+fit.GLH.test <- function(X,y,intercept=T,T.matrix,c=NULL){
   if(is.null(c)) c<-rep(0,nrow(T.matrix))
-  betahat <- fit.coef(X,y)
-  sigma.squared <- fit.sigma.squared(X,y)
+  betahat <- fit.coef(X,y,intercept)
+  sigma.squared <- fit.sigma.squared(X,y,intercept)
   T.rank <- qr(T.matrix)$rank
+  if(intercept){
+    X <- cbind(rep(1,nrow(X)),X)
+  }
 
   vec.temp <- T.matrix%*%betahat-c
   mat.temp <- T.matrix%*%solve(crossprod(X))%*%t(T.matrix)
