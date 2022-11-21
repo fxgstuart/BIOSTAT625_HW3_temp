@@ -49,10 +49,10 @@ fit.coef <- function(X,y,intercept=T){
 #'@export
 #'
 fit.values <- function(X,y,intercept=T){
+  beta <- fit.coef(X,y,intercept)
   if(intercept){
     X <- cbind(rep(1,nrow(X)),X)
   }
-  beta <- fit.coef(X,y,intercept)
   return(as.vector(X%*%beta))
 }
 
@@ -83,7 +83,7 @@ fit.values <- function(X,y,intercept=T){
 #'
 fit.predict <- function(X,y,Xnew,intercept=T){
   if(intercept){
-    X <- cbind(rep(1,nrow(X)),X)
+    Xnew <- cbind(rep(1,nrow(Xnew)),Xnew)
   }
   beta <- fit.coef(X,y,intercept)
   return(as.vector(Xnew%*%beta))
