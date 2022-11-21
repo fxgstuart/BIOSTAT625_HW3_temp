@@ -6,7 +6,11 @@ Author: Xiangeng Fang
 Maintainer: Xiangeng Fang <xgfang@umich.edu>
 Description: 
     A grammar of fitting linear model, calculating correspoding statistics and conducting hypothesis testing
-License: What license is it under?
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.2
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
