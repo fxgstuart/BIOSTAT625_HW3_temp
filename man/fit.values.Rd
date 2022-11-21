@@ -4,12 +4,15 @@
 \alias{fit.values}
 \title{fit.values}
 \usage{
-fit.values(X, y)
+fit.values(X, y, intercept = T)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
 
 \item{y}{input value of responses}
+
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
 }
 \value{
 the fitted values of linear model constructing by X and y

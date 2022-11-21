@@ -4,14 +4,17 @@
 \alias{fit.partial.test}
 \title{fit.partial.test}
 \usage{
-fit.partial.test(X, y, idx)
+fit.partial.test(X, y, intercept = T, idx)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
 
 \item{y}{input value of responses}
 
-\item{idx}{a vector of indices of tested parameters(cannot includes 1, which stands for intercept)}
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
+
+\item{idx}{a vector of indices of tested parameters}
 }
 \value{
 The test statistic and corresponding p-value of the partial test for linear model constructing by X and y
@@ -23,6 +26,6 @@ Conduct the partial test for several given parameters of a linear model
 X <- matrix(rnorm(120),nrow=12,ncol=10)
 X <- cbind(rep(1,12),X)
 y <- rnorm(12)
-fit.overall.test(X,y)
+fit.partial.test(X,y,idx=c(3:5))
 
 }

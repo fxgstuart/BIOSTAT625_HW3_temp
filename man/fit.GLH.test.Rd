@@ -4,12 +4,15 @@
 \alias{fit.GLH.test}
 \title{fit.GLH.test}
 \usage{
-fit.GLH.test(X, y, T.matrix, c = NULL)
+fit.GLH.test(X, y, intercept = T, T.matrix, c = NULL)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
 
 \item{y}{input value of responses}
+
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
 
 \item{T.matrix}{hypothesis matrix (or vector) giving linear combinations of coefficients by rows}
 
@@ -26,6 +29,11 @@ Conduct the general linear hypothesis test for several given parameters of a lin
 X <- matrix(rnorm(120),nrow=12,ncol=10)
 X <- cbind(rep(1,12),X)
 y <- rnorm(12)
-fit.overall.test(X,y)
+T <- matrix(0,nrow=2,ncol=11)
+T[4,1]<-1
+T[5,1]<--1
+T[5,2]<-1
+T[6,2]<--1
+fit.GLH.test(X,y,T.matrix)
 
 }

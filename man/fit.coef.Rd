@@ -4,12 +4,15 @@
 \alias{fit.coef}
 \title{fit.coef}
 \usage{
-fit.coef(X, y)
+fit.coef(X, y, intercept = T)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
 
 \item{y}{input value of responses}
+
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
 }
 \value{
 the estimated coefficients of linear model constructing by X and y

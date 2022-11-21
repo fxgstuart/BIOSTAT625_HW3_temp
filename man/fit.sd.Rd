@@ -4,12 +4,15 @@
 \alias{fit.sd}
 \title{fit.sd}
 \usage{
-fit.sd(X, y)
+fit.sd(X, y, intercept = T)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
 
 \item{y}{input value of responses}
+
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
 }
 \value{
 The estimated standard deviation of each parameter of linear model constructing by X and y

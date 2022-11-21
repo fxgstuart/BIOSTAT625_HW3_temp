@@ -4,12 +4,15 @@
 \alias{fit.sigma.squared}
 \title{fit.sigma.squared}
 \usage{
-fit.sigma.squared(X, y)
+fit.sigma.squared(X, y, intercept = T)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
 
 \item{y}{input value of responses}
+
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
 }
 \value{
 the estimated residual of linear model constructing by X and y

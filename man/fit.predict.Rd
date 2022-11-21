@@ -4,7 +4,7 @@
 \alias{fit.predict}
 \title{fit.predict}
 \usage{
-fit.predict(X, y, Xnew)
+fit.predict(X, y, Xnew, intercept = T)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
@@ -12,6 +12,9 @@ fit.predict(X, y, Xnew)
 \item{y}{input value of responses}
 
 \item{Xnew}{covariate matrix of new data that needs to predict}
+
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
 }
 \value{
 the predicted values of Xnew by linear model constructing by X and y

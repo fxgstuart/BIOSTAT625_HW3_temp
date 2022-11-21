@@ -4,12 +4,15 @@
 \alias{fit.overall.test}
 \title{fit.overall.test}
 \usage{
-fit.overall.test(X, y)
+fit.overall.test(X, y, intercept = T)
 }
 \arguments{
 \item{X}{input value of covariate matrix/vector}
 
 \item{y}{input value of responses}
+
+\item{intercept}{logical, "TRUE" by default.
+If "FALSE", the model will not include the intercept.}
 }
 \value{
 The test statistic and corresponding p-value of the overall test for linear model constructing by X and y
