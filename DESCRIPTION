@@ -1,11 +1,11 @@
 Package: FitLM
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A Grammar of Analyzing Linear Model
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Xiangeng Fang
+Maintainer: Xiangeng Fang <xgfang@umich.edu>
+Description: 
+    A grammar of fitting linear model, calculating correspoding statistics and conducting hypothesis testing
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
