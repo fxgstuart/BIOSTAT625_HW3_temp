@@ -29,11 +29,11 @@ Conduct the general linear hypothesis test for several given parameters of a lin
 X <- matrix(rnorm(120),nrow=12,ncol=10)
 X <- cbind(rep(1,12),X)
 y <- rnorm(12)
-T <- matrix(0,nrow=2,ncol=11)
-T[4,1]<-1
-T[5,1]<--1
-T[5,2]<-1
-T[6,2]<--1
-fit.GLH.test(X,y,T.matrix)
+T.matrix <- matrix(0,nrow=2,ncol=11)
+T.matrix[1,4]<-1
+T.matrix[1,5]<--1
+T.matrix[2,5]<-1
+T.matrix[2,6]<--1
+fit.GLH.test(X,y,T.matrix=T.matrix)
 
 }
