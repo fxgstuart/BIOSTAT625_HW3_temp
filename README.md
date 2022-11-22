@@ -15,7 +15,9 @@ In statistics, [linear regression](https://en.wikipedia.org/wiki/Linear_regressi
 
 The existing `stats::lm` in `R` is a commonly used function that can help fit linear regression model. It can provide us with estimation, related statistics, and hypothesis test results. 
 
-However, the `stats::lm` function can not directly output some important results,including the confidence interval(CI) of $\hat{\beta}$, general linear hypothesis(GLH) test results, partial F test results and hat matrix. 
+However, the `stats::lm` function can not directly output some important results,including the confidence interval(CI) of $\hat{\beta}$, general linear hypothesis(GLH) test results, partial F test results and hat matrix.
+
+Therefore, I develop this `FitLM` package to include most basic functions of `stats::lm`, and implement some new functions such as `FitLM::fit.partial.test` and `FitLM::fit.GLH.test` to improve the performance when analyzing linear regression models.
 
 ## Basic usage
 
