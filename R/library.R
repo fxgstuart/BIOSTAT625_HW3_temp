@@ -56,39 +56,6 @@ fit.values <- function(X,y,intercept=T){
   return(as.vector(X%*%beta))
 }
 
-#'fit.predict
-#'
-#'Gets the predict values of a linear model given some new data
-#'
-#'@param X input value of covariate matrix/vector
-#'
-#'@param y input value of responses
-#'
-#'@param intercept logical, "TRUE" by default.
-#'If "FALSE", the model will not include the intercept.
-#'
-#'@param Xnew covariate matrix of new data that needs to predict
-#'
-#'@return the predicted values of Xnew by linear model constructing by X and y
-#'
-#'@examples
-#'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
-#'Xnew <- matrix(rnorm(100),nrow=10,ncol=10)
-#'Xnew <- cbind(rep(1,10),Xnew)
-#'y <- rnorm(12)
-#'fit.predict(X,y,Xnew)
-#'
-#'@export
-#'
-fit.predict <- function(X,y,Xnew,intercept=T){
-  if(intercept){
-    Xnew <- cbind(rep(1,nrow(Xnew)),Xnew)
-  }
-  beta <- fit.coef(X,y,intercept)
-  return(as.vector(Xnew%*%beta))
-}
-
 #'fit.sigma.squared
 #'
 #'Gets the estimated residual of a linear model
@@ -119,7 +86,7 @@ fit.sigma.squared <- function(X,y,intercept=T){
   epsilon.hat <- y-y.hat
   mse <- crossprod(epsilon.hat)/(n-p)
 
-  return(mse)
+  return(as.numeric(mse))
 }
 
 #'fit.sd
