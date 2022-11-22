@@ -16,8 +16,6 @@ knitr::opts_chunk$set(
 
 ```{r setup, include=FALSE}
 library(FitLM)
-library(car)
-library(bench)
 ```
 
 ## Background
@@ -31,5 +29,9 @@ In statistics, [linear regression](https://en.wikipedia.org/wiki/Linear_regressi
 The existing `stats::lm` in `R` is a commonly used function that can help fit linear regression model. It can provide us with estimation, related statistics, and hypothesis test results. 
 
 However, the `stats::lm` function can not directly output some important results,including the confidence interval(CI) of $\hat{\beta}$, general linear hypothesis(GLH) test results, partial F test results and hat matrix. 
+
+## Basic usage
+
+### install
 
 
