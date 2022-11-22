@@ -381,7 +381,6 @@ fit.partial.test <- function(X,y,intercept=T,idx){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'T.matrix <- matrix(0,nrow=2,ncol=11)
 #'T.matrix[1,4]<-1
