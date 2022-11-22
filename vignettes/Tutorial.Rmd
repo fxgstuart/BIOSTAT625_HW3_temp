@@ -149,7 +149,7 @@ y <- as.matrix(mtcars$hp)
 colnames(y) <- "hp"
 X <- as.matrix(mtcars$mpg)
 colnames(X) <- "mpg"
-SLR.model.coef <- fit.coef(X,y)
+SLR.model.coefs <- fit.coef(X,y)
 print(SLR.model.coefs)
 ```
 
@@ -317,11 +317,11 @@ From the above results, it can be seen that `FitLM::fit.confint` is about `r rou
 Also, we compare the speed of conducting GLH test:
 
 ```{r}
-contrast.matrix <- matrix(c(0, 1,-1, 0, 0, 0, 0, 0), nrow = 1)  
+contrast.matrix <- matrix(c(0, 1,-1, 0, 0, 0), nrow = 1)  
 c.matrix <- c(0)  
 code_efficiency_comparison.GLH <- bench::mark("FitLM" = {
   GLH.F.statistics.actual <- fit.GLH.test(X,y,T.matrix = contrast.matrix, c = c.matrix)
-  as.vector(GLH.F.statistics.actual)
+  as.vector(GLH.F.statistics.actual$F.stat)
 }, "car::linearHypothesis" = {
   GLH.F.statistics.expected <- 
     car::linearHypothesis(model = lm(y ~ X), 
