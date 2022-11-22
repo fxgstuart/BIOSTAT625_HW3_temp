@@ -22,7 +22,6 @@ Conduct the test of significance (overall test) of a linear model
 }
 \examples{
 X <- matrix(rnorm(120),nrow=12,ncol=10)
-X <- cbind(rep(1,12),X)
 y <- rnorm(12)
 fit.overall.test(X,y)
 

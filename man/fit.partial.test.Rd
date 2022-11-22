@@ -24,7 +24,6 @@ Conduct the partial test for several given parameters of a linear model
 }
 \examples{
 X <- matrix(rnorm(120),nrow=12,ncol=10)
-X <- cbind(rep(1,12),X)
 y <- rnorm(12)
 fit.partial.test(X,y,idx=c(3:5))
 

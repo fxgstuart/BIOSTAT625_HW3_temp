@@ -22,7 +22,6 @@ Gets the estimated R squared of a linear model
 }
 \examples{
 X <- matrix(rnorm(120),nrow=12,ncol=10)
-X <- cbind(rep(1,12),X)
 y <- rnorm(12)
 fit.R.squared(X,y)
 
