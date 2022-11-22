@@ -2,6 +2,8 @@
 #'
 #'Gets the estimated coefficients of a linear model
 #'
+#'@import bench
+#'
 #'@param X input value of covariate matrix/vector
 #'
 #'@param y input value of responses
@@ -31,6 +33,8 @@ fit.coef <- function(X,y,intercept=T){
 #'
 #'Gets the fitted values of a linear model
 #'
+#'@import bench
+#'
 #'@param X input value of covariate matrix/vector
 #'
 #'@param y input value of responses
@@ -59,6 +63,8 @@ fit.values <- function(X,y,intercept=T){
 #'fit.sigma.squared
 #'
 #'Gets the estimated residual of a linear model
+#'
+#'@import bench
 #'
 #'@param X input value of covariate matrix/vector
 #'
@@ -93,6 +99,8 @@ fit.sigma.squared <- function(X,y,intercept=T){
 #'
 #'Gets the estimated standard deviation of each parameter(beta) of a linear model
 #'
+#'@import bench
+#'
 #'@param X input value of covariate matrix/vector
 #'
 #'@param y input value of responses
@@ -126,6 +134,10 @@ fit.sd <- function(X,y,intercept=T){
 #'
 #'Conducting t test for each parameter(beta) of a linear model
 #'
+#'@import bench
+#'
+#'@importFrom stats pf pt qt
+#'
 #'@param X input value of covariate matrix/vector
 #'
 #'@param y input value of responses
@@ -157,6 +169,10 @@ fit.t.test <- function(X,y,intercept=T){
 #'fit.confint
 #'
 #'Construct the confidence intervals parameters of a linear model
+#'
+#'@import bench
+#'
+#'@importFrom stats pf pt qt
 #'
 #'@param X input value of covariate matrix/vector
 #'
@@ -196,6 +212,8 @@ fit.confint <- function(X,y,intercept=T,level=0.95){
 #'
 #'Calculate the hat matrix of a linear model
 #'
+#'@import bench
+#'
 #'@param X input value of covariate matrix/vector
 #'
 #'@param intercept logical, "TRUE" by default.
@@ -222,6 +240,10 @@ fit.hat.matrix <- function(X,intercept=T){
 #'fit.overall.test
 #'
 #'Conduct the test of significance (overall test) of a linear model
+#'
+#'@import bench
+#'
+#'@importFrom stats pf pt qt
 #'
 #'@param X input value of covariate matrix/vector
 #'
@@ -256,6 +278,8 @@ fit.overall.test <- function(X,y,intercept=T){
 #'
 #'Gets the estimated R squared of a linear model
 #'
+#'@import bench
+#'
 #'@param X input value of covariate matrix/vector
 #'
 #'@param y input value of responses
@@ -289,6 +313,12 @@ fit.R.squared <- function(X,y,intercept=T){
 #'fit.partial.test
 #'
 #'Conduct the partial test for several given parameters of a linear model
+#'
+#'@import bench
+#'
+#'@importFrom stats pf pt qt
+#'
+#'@import car bench
 #'
 #'@param X input value of covariate matrix/vector
 #'
@@ -330,6 +360,10 @@ fit.partial.test <- function(X,y,intercept=T,idx){
 #'fit.GLH.test
 #'
 #'Conduct the general linear hypothesis test for several given parameters of a linear model
+#'
+#'@importFrom stats pf pt qt
+#'
+#'@import car bench
 #'
 #'@param X input value of covariate matrix/vector
 #'
