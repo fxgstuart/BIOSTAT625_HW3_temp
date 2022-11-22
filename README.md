@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/fxgstuart/BIOSTAT625_HW3_temp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/fxgstuart/BIOSTAT625_HW3_temp/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/fxgstuart/BIOSTAT625_HW3_temp/branch/main/graph/badge.svg)](https://app.codecov.io/gh/fxgstuart/BIOSTAT625_HW3_temp?branch=main)
 <!-- badges: end -->
 
 ## Background
