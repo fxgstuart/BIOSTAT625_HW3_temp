@@ -21,7 +21,7 @@ Therefore, I develop this `FitLM` package to include most basic functions of `st
 
 ## Basic usage
 
-### installation
+### Installation
 
 * `FitLM` can be downloaded from github:
 
