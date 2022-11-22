@@ -84,7 +84,7 @@ fit.sigma.squared <- function(X,y,intercept=T){
   p <- p+intercept
   y.hat <- fit.values(X,y,intercept)
   epsilon.hat <- y-y.hat
-  mse <- crossprod(epsilon.hat)/(n-p)
+  mse <- as.numeric(crossprod(epsilon.hat))/(n-p)
 
   return(as.numeric(mse))
 }
