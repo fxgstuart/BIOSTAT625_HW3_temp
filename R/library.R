@@ -145,7 +145,11 @@ fit.sigma.squared <- function(X,y,intercept=T){
 #'
 fit.sd <- function(X,y,intercept=T){
   sigma.squared <- fit.sigma.squared(X,y,intercept)
-  var.betahat <- diag(crossprod(X))*c(sigma.squared)
+
+  if(intercept){
+    X <- cbind(rep(1,nrow(X)),X)
+  }
+  var.betahat <- diag(solve(crossprod(X)))*c(sigma.squared)
   sd.betahat <- sqrt(var.betahat)
 
   return(sd.betahat)
@@ -178,7 +182,7 @@ fit.t.test <- function(X,y,intercept=T){
   betahat <- fit.coef(X,y,intercept)
   sd.betahat <- fit.sd(X,y,intercept)
   t.stat <- c(betahat/sd.betahat)
-  p.value <- c(2*(1-pt(t.stat,n-p)))
+  p.value <- c(2*pmin(1-pt(t.stat,n-p),pt(t.stat,n-p)))
 
   return(list(t = t.stat, p.value = p.value))
 }
@@ -211,10 +215,10 @@ fit.confint <- function(X,y,intercept=T,level=0.95){
   p <- ncol(X)+intercept
   betahat <- fit.coef(X,y,intercept)
   sd.betahat <- fit.sd(X,y,intercept)
-  t.value <- pt(1-(1-level)/2,n-p)
+  t.value <- qt(1-(1-level)/2,n-p)
 
-  beta.CI.upper <- betahat + t.value * se_betahat
-  beta.CI.lower <- betahat - t.bound * se_betahat
+  beta.CI.upper <- betahat + t.value * sd.betahat
+  beta.CI.lower <- betahat - t.value * sd.betahat
   CI.beta.matrix <- cbind(beta.CI.lower, beta.CI.upper)
   colnames(CI.beta.matrix) <- c("lower","upper")
 
@@ -278,7 +282,7 @@ fit.overall.test <- function(X,y,intercept=T){
 
   F.stat <- (SSR/(p-intercept))/(SSE/(n-p))
   p.value <- 1-pf(F.stat, p-intercept, n-p)
-  return(list(F = F.stat, p.value = p.value))
+  return(list(F = F.stat, p.value = p.value, df1 = p-intercept, df2 = n-p))
 }
 
 #'fit.R.squared
@@ -310,7 +314,7 @@ fit.R.squared <- function(X,y,intercept=T){
   SSR <- sum((yhat-mean(y))^2)
 
   res1 <- SSR/(SSR+SSE)
-  res2 <- 1-(SSE/(n-p))/(SSY/(n-intercept))
+  res2 <- 1-(SSE/(n-p))/((SSE+SSR)/(n-intercept))
 
   return(list(R.squared = res1, adj.R.squared = res2))
 }
@@ -378,12 +382,12 @@ fit.partial.test <- function(X,y,intercept=T,idx){
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
 #'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
-#'T <- matrix(0,nrow=2,ncol=11)
-#'T[4,1]<-1
-#'T[5,1]<--1
-#'T[5,2]<-1
-#'T[6,2]<--1
-#'fit.GLH.test(X,y,T.matrix)
+#'T.matrix <- matrix(0,nrow=2,ncol=11)
+#'T.matrix[1,4]<-1
+#'T.matrix[1,5]<--1
+#'T.matrix[2,5]<-1
+#'T.matrix[2,6]<--1
+#'fit.GLH.test(X,y,T.matrix=T.matrix)
 #'
 #'@export
 #'
