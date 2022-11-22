@@ -15,7 +15,6 @@
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.coef(X,y)
 #'
@@ -46,7 +45,6 @@ fit.coef <- function(X,y,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.values(X,y)
 #'
@@ -77,7 +75,6 @@ fit.values <- function(X,y,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.sigma.squared(X,y)
 #'
@@ -112,7 +109,6 @@ fit.sigma.squared <- function(X,y,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.sd(X,y)
 #'
@@ -149,7 +145,6 @@ fit.sd <- function(X,y,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.t.test(X,y)
 #'
@@ -187,7 +182,6 @@ fit.t.test <- function(X,y,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.confint(X,y)
 #'
@@ -223,7 +217,6 @@ fit.confint <- function(X,y,intercept=T,level=0.95){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.hat.matrix(X)
 #'
@@ -256,7 +249,6 @@ fit.hat.matrix <- function(X,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.overall.test(X,y)
 #'
@@ -291,7 +283,6 @@ fit.overall.test <- function(X,y,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.R.squared(X,y)
 #'
@@ -333,7 +324,6 @@ fit.R.squared <- function(X,y,intercept=T){
 #'
 #'@examples
 #'X <- matrix(rnorm(120),nrow=12,ncol=10)
-#'X <- cbind(rep(1,12),X)
 #'y <- rnorm(12)
 #'fit.partial.test(X,y,idx=c(3:5))
 #'
